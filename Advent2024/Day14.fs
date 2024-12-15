@@ -115,7 +115,7 @@ let printRobotsMovement width height steps (robots: Robot list) =
 
 let part1 () =
     let robots =
-        readRobots "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/Day14.txt"
+        readRobots "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day14.txt"
 
     let width, height, steps = 101, 103, 100
     let movedRobots = moveRobots width height steps robots
@@ -125,7 +125,7 @@ let part1 () =
 
 let part2 () =
     let robots =
-        readRobots "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/Day14.txt"
+        readRobots "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day14.txt"
 
     let width, height, steps = 101, 103, 10_000
     printRobotsMovement width height steps robots

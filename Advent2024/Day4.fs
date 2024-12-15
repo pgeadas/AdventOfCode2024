@@ -25,17 +25,6 @@ let (directions: ExtendedDirection array) =
        Diagonal DownRight
        Diagonal DownLeft |]
 
-let getNextPosition (x, y) (direction: ExtendedDirection) =
-    match direction with
-    | Standard Right -> (x, y + 1)
-    | Standard Left -> (x, y - 1)
-    | Standard Up -> (x - 1, y)
-    | Standard Down -> (x + 1, y)
-    | Diagonal UpRight -> (x - 1, y + 1)
-    | Diagonal UpLeft -> (x - 1, y - 1)
-    | Diagonal DownRight -> (x + 1, y + 1)
-    | Diagonal DownLeft -> (x + 1, y - 1)
-
 let isValidPosition rows cols (x, y) =
     x >= 0 && x < rows && y >= 0 && y < cols
 
@@ -60,7 +49,7 @@ let findXMAS (matrix: char list list) =
             let currentChar = matrix[x][y]
 
             if currentChar = List.head word then
-                let nextPos = getNextPosition (x, y) direction
+                let nextPos = nextPositionExtended (x, y) direction
                 checkWord nextPos direction (List.tail word) ((x, y) :: positions)
             else
                 false
@@ -136,12 +125,8 @@ let countValidStars (matrix: char list list) =
 
     count
 
-let part1 input = findXMAS input
-let part2 input = countValidStars input
+let part1 () =
+    findXMAS (readAllLines Console.ReadLine)
 
-// [<EntryPoint>]
-// let main argv =
-//     let input = readAllLines Console.ReadLine
-//     //printfn $"%A{part1 input}"
-//     printfn $"%A{part2 input}"
-//     0
+let part2 () =
+    countValidStars (readAllLines Console.ReadLine)

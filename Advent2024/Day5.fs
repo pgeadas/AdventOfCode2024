@@ -2,6 +2,7 @@ module Advent2024.Day5
 
 open System
 open System.Collections.Generic
+open Advent2024.Node
 
 let readAllLines readLineFn =
     let rec readLines list =
@@ -29,36 +30,6 @@ let readInstructions readLineFn =
 
     readLines []
 
-type Node<'T when 'T: comparison>(value: 'T) =
-    let adjacents = HashSet<Node<'T>>()
-
-    member this.Value = value
-    member this.Adjacents = adjacents
-
-    member this.AddAdjacent(node: Node<'T>) = adjacents.Add(node) |> ignore
-
-    interface IComparable with
-        member this.CompareTo(obj) =
-            match obj with
-            | :? Node<'T> as other -> compare this.Value other.Value
-            | _ -> invalidArg "obj" "Cannot compare values of different types."
-
-    override this.Equals(obj) =
-        match obj with
-        | :? Node<'T> as other -> this.Value = other.Value
-        | _ -> false
-
-    override this.GetHashCode() = hash this.Value
-
-    override this.ToString() =
-        let adjacentValues =
-            adjacents
-            |> Seq.toList
-            |> List.map _.Value
-            |> List.map string
-            |> String.concat ", "
-
-        sprintf "Node(%A) -> [%s]" this.Value adjacentValues
 
 let toNodes1 (pageOrderings: (string * string) list) =
     pageOrderings
@@ -110,7 +81,7 @@ let createGraph (pageOrderings: (Node<string> * Node<string>) list) =
 
     graph
 
-let getMiddleNodes (nodesInstructions: Node<string> list list)=
+let getMiddleNodes (nodesInstructions: Node<string> list list) =
     let getMiddleValue (list: Node<string> list) =
         let midIndex = (List.length list) / 2
         list[midIndex]
@@ -154,7 +125,14 @@ let getIncorrectIndices (instructions: Node<'T> list list) (indices: int list) =
 let fixInstruction (instruction: Node<string> list) (topologicalSortedMap: Map<string, int>) =
     instruction |> List.sortBy (fun node -> topologicalSortedMap[node.Value])
 
-let part1 (nodesInstructions: Node<string> list list) (graph: HashSet<Node<string>>) =
+let part1 () =
+    let pageOrderings = readAllLines Console.ReadLine
+    let instructions = readInstructions Console.ReadLine
+    let nodesPageOrderings = toNodes1 pageOrderings
+    let nodesInstructions = toNodes2 instructions
+
+    let graph = createGraph nodesPageOrderings
+    //printfn $"graph: %A{Seq.toList graph}"
     let validIndexes = findValidPathsIndexes nodesInstructions graph
 
     let middleNodes =
@@ -162,8 +140,10 @@ let part1 (nodesInstructions: Node<string> list list) (graph: HashSet<Node<strin
 
     let sumMiddleNodes = middleNodes |> List.map _.Value |> List.map int |> List.sum
 
-    validIndexes, sumMiddleNodes
+    // validIndexes, sumMiddleNodes
+    sumMiddleNodes
 
+// Failed attempt to solve the problem using topological order.
 let part2 (instructions: Node<string> list list) (indices: int list) graph =
     let invalidIndices = getIncorrectIndices instructions indices
     let wrongInstructions = getInstructionsAtIndices instructions invalidIndices
@@ -176,20 +156,3 @@ let part2 (instructions: Node<string> list list) (indices: int list) graph =
     let middleNodes = getMiddleNodes fixedInstructions
     let sumMiddleNodes = middleNodes |> List.map _.Value |> List.map int |> List.sum
     sumMiddleNodes
-
-// [<EntryPoint>]
-// let main argv =
-//     let pageOrderings = readAllLines Console.ReadLine
-//     let instructions = readInstructions Console.ReadLine
-//     let nodesPageOrderings = toNodes1 pageOrderings
-//     let nodesInstructions = toNodes2 instructions
-//
-//     let graph = createGraph nodesPageOrderings
-//     //printfn $"graph: %A{Seq.toList graph}"
-//
-//     let validIndexes, sumMiddleNodes = part1 nodesInstructions graph
-//     printfn $"%d{sumMiddleNodes}"
-//
-//     let sumMiddleNodes2 = part2 nodesInstructions validIndexes graph
-//     printfn $"%A{sumMiddleNodes2}"
-//     0

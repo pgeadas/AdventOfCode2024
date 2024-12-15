@@ -3,6 +3,8 @@ module Advent2024.Day5_Fail
 open System
 open System.Collections.Generic
 
+// Failed attempt to solve the problem with an OrderedSet, but keeping it here for reference
+
 type OrderedSet<'T when 'T: equality>(initialElements: 'T list) =
     let existingValues = HashSet<'T>(initialElements)
     let queue = ResizeArray<'T>(initialElements)
@@ -82,4 +84,3 @@ let toDictionary (pageOrderings: (string * string) list) =
 let part1 (pageOrderings: (string * string) list) updates =
     let dict = toDictionary pageOrderings
     Seq.iter (fun key -> printfn $"%A{key}: %A{dict[key]}") dict.Keys
-

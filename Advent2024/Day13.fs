@@ -89,13 +89,8 @@ let readGames filePath =
 
 
 let part1 () =
-    let games = readGames "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/Day13.txt"
+    let games = readGames "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day13.txt"
 
     games
     |> List.map (fun game -> buildMatrix game.ButtonA game.ButtonB game.Prize)
     |> List.sum
-
-let part2 () =
-    let games = readGames "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/Day13.txt"
-
-    games
