@@ -3,7 +3,7 @@ module Advent2024.Day9
 open System.IO
 
 let readInput () =
-    File.ReadLines("/Users/pgeadas/RiderProjects/Advent2024/Advent2024/Day9.txt")
+    File.ReadLines("/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day9.txt")
     |> Seq.head
     |> Seq.map (string >> int)
     |> Array.ofSeq
@@ -117,22 +117,16 @@ let checksumPart2 (input: (string * int) list) : uint64 =
     |> List.map (fun (fileId, fileSize) -> if fileId = "." then ("0", fileSize) else (fileId, fileSize))
     |> count 0 0UL
 
-let part1 input =
+let part1 () =
+    let input = readInput ()
     let unfolded = unfold input 0 0 []
     let dots = unfolded |> Seq.filter (fun c -> c = ".") |> Seq.length
     let compacted = compact unfolded dots
     checksum compacted
 
-let part2 input =
+let part2 () =
+    let input = readInput ()
     let unfolded = unfold input 0 0 []
     let grouped = groupAndCount unfolded
     let defragmented = insertAtDots grouped |> List.ofSeq
     checksumPart2 defragmented
-
-// [<EntryPoint>]
-// let main argv =
-//     let input = readInput ()
-//     printfn "%A" (part1 input)
-//     printfn "%A" (part2 input)
-//
-//     0 // return an integer exit code

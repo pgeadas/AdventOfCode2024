@@ -6,6 +6,13 @@ type StandardDirection =
     | Up
     | Down
 
+let nextPositionStandard (x, y) (direction: StandardDirection) =
+    match direction with
+    | Right -> (x, y + 1)
+    | Left -> (x, y - 1)
+    | Up -> (x - 1, y)
+    | Down -> (x + 1, y)
+
 type DiagonalDirection =
     | UpRight
     | UpLeft
@@ -15,6 +22,17 @@ type DiagonalDirection =
 type ExtendedDirection =
     | Standard of StandardDirection
     | Diagonal of DiagonalDirection
+
+let nextPositionExtended (x, y) (direction: ExtendedDirection) =
+    match direction with
+    | Standard Right -> (x, y + 1)
+    | Standard Left -> (x, y - 1)
+    | Standard Up -> (x - 1, y)
+    | Standard Down -> (x + 1, y)
+    | Diagonal UpRight -> (x - 1, y + 1)
+    | Diagonal UpLeft -> (x - 1, y - 1)
+    | Diagonal DownRight -> (x + 1, y + 1)
+    | Diagonal DownLeft -> (x + 1, y - 1)
 
 type Coordinate(x: int, y: int) =
     member this.X = x

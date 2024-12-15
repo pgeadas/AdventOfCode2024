@@ -1,41 +1,12 @@
 module Advent2024.Day10
 
-open System.IO
 open System.Collections.Generic
 open Advent2024.Common
+open Advent2024.Matrix
 
-let readFromFile filePath =
-    let matrix, positions =
-        File.ReadLines(filePath)
-        |> Seq.mapi (fun rowIndex line ->
-            let elements = Array.ofSeq line |> Array.map (string >> int)
-
-            let linePositions =
-                elements
-                |> Array.indexed
-                |> Array.fold (fun acc (columnIndex, value) -> if value = 0 then (rowIndex, columnIndex) :: acc else acc) []
-
-            elements, linePositions)
-        |> Seq.fold (fun (matrix, allPositions) (elements, positions) -> (elements :: matrix, positions @ allPositions)) ([], [])
-
-    List.rev matrix, positions
+let filePath = "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day10.txt"
 
 let directions = [| Right; Left; Up; Down |]
-
-let getNextPosition (x, y) direction =
-    match direction with
-    | Right -> (x, y + 1)
-    | Left -> (x, y - 1)
-    | Up -> (x - 1, y)
-    | Down -> (x + 1, y)
-
-let isValidPosition rows cols (x, y) =
-    x >= 0 && x < rows && y >= 0 && y < cols
-
-let matrixSize (matrix: int array list) =
-    let rows = List.length matrix
-    let cols = List.head matrix |> Array.length
-    rows, cols
 
 let findAllPaths (matrix: int array list) (startPositions: (int * int) list) =
     let rows, cols = matrixSize matrix
@@ -58,7 +29,7 @@ let findAllPaths (matrix: int array list) (startPositions: (int * int) list) =
             let mutable keepSearching = false
 
             for direction in directions do
-                let nextPos = getNextPosition currentPos direction
+                let nextPos = nextPositionStandard currentPos direction
                 let nextX, nextY = nextPos
 
                 if isValidPosition rows cols nextPos && not visited[nextX, nextY] then
@@ -80,9 +51,11 @@ let findAllPaths (matrix: int array list) (startPositions: (int * int) list) =
 
     allPaths
 
-let part1 (matrix: int array list) (startPositions: (int * int) list) =
-    let paths = findAllPaths matrix startPositions
-    // Count paths with same start-end positions as one
+let part1 () =
+    let matrix, startPositions = readAndFindAllInt filePath '0'
+
+    let paths = findAllPaths (List.ofSeq matrix) startPositions
+    // Count paths with same start-end positions as only one
     let uniquePathCount =
         paths
         |> Seq.collect _.Value
@@ -92,19 +65,11 @@ let part1 (matrix: int array list) (startPositions: (int * int) list) =
 
     uniquePathCount
 
-let part2 (matrix: int array list) (startPositions: (int * int) list) =
-    let paths = findAllPaths matrix startPositions
+let part2 () =
+    let matrix, startPositions = readAndFindAllInt filePath '0'
+
+    let paths = findAllPaths (List.ofSeq matrix) startPositions
     // Count how many paths start at the same position
     let ratings = paths |> Seq.map _.Value |> Seq.map Seq.length |> Seq.sum
 
     ratings
-
-// [<EntryPoint>]
-// let main argv =
-//     let input, indexes =
-//         readFromFile "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/Day10.txt"
-//
-//     // printfn "%d" (part1 (List.ofSeq input) indexes)
-//     printfn "%d" (part2 (List.ofSeq input) indexes)
-//
-//     0

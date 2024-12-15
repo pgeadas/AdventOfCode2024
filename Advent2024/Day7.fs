@@ -64,7 +64,7 @@ let tryFindValue (values: uint64 list) value =
 
 let calculateCalibrationValues operations =
     let results =
-        readResults "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/Day7.txt"
+        readResults "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day7.txt"
 
     let calculations =
         results |> List.map _.Components |> List.map (calculateValues operations)

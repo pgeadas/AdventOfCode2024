@@ -27,12 +27,13 @@ let getAllMatches (regex: Regex) input =
 let multAndSum list =
     list |> List.map (fun (a, b) -> a * b) |> List.sum
 
-let part1 input =
+let part1 () =
+    let input = readAllLinesFromConsole
     let matches = getAllMatches pattern input
     multAndSum matches
 
-
-let part2 (input: string) =
+let part2 () =
+    let input = readAllLinesFromConsole
     let mutable parsingEnabled = true // Initially enabled to capture initial `mul`
     let mutable results = []
     let mutable index = 0
@@ -59,11 +60,3 @@ let part2 (input: string) =
             index <- index + 1
 
     results |> multAndSum
-
-
-// [<EntryPoint>]
-// let main argv =
-//     let input = readAllLinesFromConsole
-//     //printfn $"%d{part1 input}"
-//     printfn $"%d{part2 input}"
-//     0
