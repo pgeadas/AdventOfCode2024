@@ -21,11 +21,11 @@ let buildMatrix (A: Button) (B: Button) (prize: Prize) =
         let row = ResizeArray<Coordinate>()
 
         for _ in 0..size do
-            row.Add(Coordinate(0, 0))
+            row.Add(Coordinate.Create(0, 0))
 
         matrix.Add(row)
 
-    matrix[0][0] <- Coordinate(0, 0)
+    matrix[0][0] <- Coordinate.Create(0, 0)
 
     for i in 1..size do
         matrix[i][0] <- matrix[i - 1][0] + A.Coordinate
@@ -56,7 +56,7 @@ let parseCoordinate (input: string) =
 
     let x = parts[1].Split(',').[0].Trim() |> int
     let y = parts[2].Trim() |> int
-    Coordinate(x, y)
+    Coordinate.Create(x, y)
 
 let parseGame (lines: string array) =
     let buttonA =

@@ -6,6 +6,27 @@ type StandardDirection =
     | Up
     | Down
 
+    member this.TurnRight() =
+        match this with
+        | Up -> Right
+        | Right -> Down
+        | Down -> Left
+        | Left -> Up
+
+    member this.TurnLeft() =
+        match this with
+        | Up -> Left
+        | Left -> Down
+        | Down -> Right
+        | Right -> Up
+
+    member this.Index() =
+        match this with
+        | Up -> 0
+        | Down -> 1
+        | Left -> 2
+        | Right -> 3
+
 let nextPositionStandard (x, y) (direction: StandardDirection) =
     match direction with
     | Right -> (x, y + 1)
@@ -34,13 +55,17 @@ let nextPositionExtended (x, y) (direction: ExtendedDirection) =
     | Diagonal DownRight -> (x + 1, y + 1)
     | Diagonal DownLeft -> (x + 1, y - 1)
 
-type Coordinate(x: int, y: int) =
-    member this.X = x
-    member this.Y = y
+[<Struct>]
+type Coordinate =
+    { X: int
+      Y: int }
+
+    static member Create(x, y) = { X = x; Y = y }
 
     member this.Add(other: Coordinate) =
-        Coordinate(this.X + other.X, this.Y + other.Y)
+        { X = this.X + other.X
+          Y = this.Y + other.Y }
 
-    static member (+)(a: Coordinate, b: Coordinate) = Coordinate(a.X + b.X, a.Y + b.Y)
+    static member (+)(a: Coordinate, b: Coordinate) = { X = a.X + b.X; Y = a.Y + b.Y }
 
     override this.ToString() = $"X={this.X}, Y={this.Y}"
