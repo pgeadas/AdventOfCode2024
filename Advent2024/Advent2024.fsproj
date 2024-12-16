@@ -12,6 +12,7 @@
 		<Content Include="inputs\Day9.txt" />
 		<Content Include="inputs\Day10.txt" />
 		<Content Include="inputs\Day13.txt" />
+		<Content Include="inputs\Day4.txt" />
 		<Content Include="inputs\Day14.txt" />
 		<Content Include="inputs\Day15.txt" />
 		<Compile Include="Common.fs" />
