@@ -1,6 +1,7 @@
 module Advent2024.Matrix
 
 open System.IO
+open System
 
 /// <summary>
 /// Reads a matrix from a file while searching for the first occurrence of a target character within the matrix.
@@ -104,6 +105,16 @@ let readAndFindAllInt filePath targetChar =
             failwithf "Character %c is not a valid digit" c
 
     readAndFindAll filePath targetChar charToDigit
+
+let read filePath =
+
+    let processLine matrix line =
+        if String.IsNullOrWhiteSpace(line) then
+            List.rev matrix
+        else
+            (Array.ofSeq line :: matrix)
+
+    File.ReadLines(filePath) |> Seq.fold processLine []
 
 /// <summary>
 /// Calculates the size of the given matrix.

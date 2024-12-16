@@ -2,18 +2,7 @@ module Advent2024.Day4
 
 open System
 open Advent2024.Common
-
-let readAllLines readLineFn =
-    let rec readLines matrix =
-        let input = readLineFn ()
-
-        if String.IsNullOrWhiteSpace(input) then
-            List.rev matrix
-        else
-            let values = input |> List.ofSeq
-            readLines (values :: matrix)
-
-    readLines []
+open Advent2024.Matrix
 
 let (directions: ExtendedDirection array) =
     [| Standard Right
@@ -25,17 +14,9 @@ let (directions: ExtendedDirection array) =
        Diagonal DownRight
        Diagonal DownLeft |]
 
-let isValidPosition rows cols (x, y) =
-    x >= 0 && x < rows && y >= 0 && y < cols
-
-let matrixSize (matrix: char list list) =
-    let rows = List.length matrix
-    let cols = List.head matrix |> List.length
-    rows, cols
-
-let findXMAS (matrix: char list list) =
+let findXMAS (matrix: char array list) =
     let rows, cols = matrixSize matrix
-    let usedPositions = System.Collections.Generic.HashSet<int * int>()
+    let usedPositions = Collections.Generic.HashSet<int * int>()
     let mutable totalFound = 0
 
     // Check if word exists starting from position in given direction
@@ -68,12 +49,12 @@ let findXMAS (matrix: char list list) =
         matrix
         |> List.mapi (fun x row ->
             row
-            |> List.mapi (fun y char -> if usedPositions.Contains(x, y) then char else '.'))
+            |> Array.mapi (fun y char -> if usedPositions.Contains(x, y) then char else '.'))
 
-    printfn $"%A{occupied}"
+    //printfn $"%A{occupied}"
     totalFound
 
-let countValidStars (matrix: char list list) =
+let countValidStars (matrix: char array list) =
     let rows, cols = matrixSize matrix
     let isValidPosition (x, y) = isValidPosition rows cols (x, y)
 
@@ -119,14 +100,10 @@ let countValidStars (matrix: char list list) =
                       yield 1 ]
         |> List.sum
 
-    // Print the resulting matrix
-    for row in resultMatrix do
-        printfn "%s" (row |> Array.map string |> String.concat "")
-
     count
 
 let part1 () =
-    findXMAS (readAllLines Console.ReadLine)
+    findXMAS (read "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day4.txt")
 
 let part2 () =
-    countValidStars (readAllLines Console.ReadLine)
+    countValidStars (read "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day4.txt")
