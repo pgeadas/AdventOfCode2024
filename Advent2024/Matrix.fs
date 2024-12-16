@@ -125,3 +125,63 @@ let matrixSize matrix =
 /// <returns><c>true</c> if the position (x, y) is within the bounds of the matrix; otherwise, <c>false</c>.</returns>
 let isValidPosition rows cols (x, y) =
     x >= 0 && x < rows && y >= 0 && y < cols
+
+/// <summary>
+/// Reads a matrix and groups of strings from a file, separated by empty lines.
+/// </summary>
+/// <param name="filePath">The path of the file containing the matrix and additional data.</param>
+/// <param name="targetChar">The character to search for within the matrix.</param>
+/// <returns>
+/// A tuple containing:
+/// <list type="bullet">
+///   <item>The matrix and target position from the first group.</item>
+///   <item>A list of string lists representing subsequent groups separated by empty lines.</item>
+/// </list>
+/// </returns>
+let readMatrixAndGroups filePath targetChar =
+    let processLine (matrix, targetPos) (rowIndex, line) =
+        let charArray = Array.ofSeq line
+
+        match targetPos with
+        | None ->
+            let newTargetPos =
+                Seq.tryFindIndex (fun char -> char = targetChar) line
+                |> Option.map (fun colIndex -> (rowIndex, colIndex))
+
+            (charArray :: matrix, newTargetPos)
+        | Some _ -> (charArray :: matrix, targetPos)
+
+    let lines = File.ReadLines(filePath) |> Seq.indexed
+
+    // Read until first empty line to get matrix
+    let matrix, targetPos, remainingLines =
+        let rec readMatrix acc lines =
+            match Seq.tryHead lines with
+            | None -> acc, Seq.empty
+            | Some(_, "") -> acc, Seq.skip 1 lines
+            | Some(idx, line) ->
+                let newAcc = processLine acc (idx, line)
+                readMatrix newAcc (Seq.skip 1 lines)
+
+        let (matrix, pos), remaining = readMatrix ([], None) lines
+        (List.rev matrix, pos, remaining)
+
+    // Group remaining lines
+    let groups =
+        remainingLines
+        |> Seq.map snd // Get just the line content
+        |> Seq.fold
+            (fun (currentGroup, allGroups) line ->
+                if line = "" then
+                    if List.isEmpty currentGroup then
+                        ([], allGroups)
+                    else
+                        ([], Array.ofSeq (List.rev currentGroup) :: allGroups)
+                else
+                    (Array.ofSeq line :: currentGroup, allGroups))
+            ([], [])
+        |> function
+            | [], groups -> List.rev groups
+            | lastGroup, groups -> List.rev (Array.ofSeq (List.rev lastGroup) :: groups)
+
+    (matrix, targetPos), groups
