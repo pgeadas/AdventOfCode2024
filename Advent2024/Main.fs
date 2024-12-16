@@ -62,6 +62,12 @@ let runDay15 () =
     printfn "Part 1: \n%A" (Day15.part1 ())
     //printfn "Part 2: \n%A" (Day15.part2 ())
 
+
+let runDay16 () =
+    printfn "Day 16:"
+    printfn "Part 1: \n%A" (Day16.part1 ())
+   // printfn "Part 2: \n%A" (Day16.part2 ())
+
 [<EntryPoint>]
 let main argv =
     match argv with
@@ -80,6 +86,7 @@ let main argv =
         | 13 -> runDay13 ()
         | 14 -> runDay14 ()
         | 15 -> runDay15 ()
+        | 16 -> runDay16 ()
         | n -> printfn "Day %d not implemented" n
     | _ -> printfn "Usage: program.exe [day]"
 

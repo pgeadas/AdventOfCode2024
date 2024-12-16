@@ -16,7 +16,7 @@ type Robot =
     member this.MoveSteps(x, y, steps) =
         let newX = ((this.originalPos.X + this.velocity.dx * steps) % x + x) % x
         let newY = ((this.originalPos.Y + this.velocity.dy * steps) % y + y) % y
-        this.position <- Coordinate(newX, newY)
+        this.position <- Coordinate.Create(newX, newY)
         this
 
 let parseRobotLine (line: string) =
@@ -28,8 +28,8 @@ let parseRobotLine (line: string) =
     let dx = parts[2] |> int
     let dy = parts[3] |> int
 
-    { originalPos = Coordinate(x, y)
-      position = Coordinate(x, y)
+    { originalPos = Coordinate.Create(x, y)
+      position = Coordinate.Create(x, y)
       velocity = { dx = dx; dy = dy } }
 
 let readRobots filePath =

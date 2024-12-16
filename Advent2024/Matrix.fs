@@ -70,6 +70,28 @@ let readAndFindAll<'T> filePath targetChar (mapper: char -> 'T) =
 
     (List.rev matrix, List.rev targetPositions)
 
+let readAndFindAllChars filePath (targetChars: char list) =
+
+    let processLine (matrix, targets) (rowIndex, line) =
+        let mappedRow = line |> Array.ofSeq
+
+        let lineTargets =
+            line
+            |> Seq.mapi (fun colIndex char ->
+                if List.contains char targetChars then
+                    Some(char, (rowIndex, colIndex))
+                else
+                    None)
+            |> Seq.choose id
+            |> Seq.toList
+
+        (mappedRow :: matrix, lineTargets @ targets)
+
+    let matrix, targetPositions =
+        File.ReadLines(filePath) |> Seq.indexed |> Seq.fold processLine ([], [])
+
+    (List.rev matrix, List.rev targetPositions)
+
 /// <summary>
 /// Reads a characters matrix from a file and searches for all occurrences of a target character within the matrix.
 /// </summary>
