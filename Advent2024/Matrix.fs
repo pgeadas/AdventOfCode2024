@@ -2,6 +2,7 @@ module Advent2024.Matrix
 
 open System.IO
 open System
+open Advent2024.Common
 
 /// <summary>
 /// Reads a matrix from a file while searching for the first occurrence of a target character within the matrix.
@@ -134,7 +135,7 @@ let readMatrix filePath =
         if String.IsNullOrWhiteSpace(line) then
             List.rev matrix
         else
-           (Array.ofSeq line :: matrix)
+            (Array.ofSeq line :: matrix)
 
     File.ReadLines(filePath) |> Seq.fold processLine [] |> List.rev
 
@@ -158,6 +159,9 @@ let matrixSize matrix =
 /// <returns><c>true</c> if the position (x, y) is within the bounds of the matrix; otherwise, <c>false</c>.</returns>
 let isValidPosition rows cols (x, y) =
     x >= 0 && x < rows && y >= 0 && y < cols
+
+let isValidCoordinate rows cols (coord: Coordinate) =
+    isValidPosition rows cols (coord.X, coord.Y)
 
 /// <summary>
 /// Reads a matrix and groups of strings from a file, separated by empty lines.
