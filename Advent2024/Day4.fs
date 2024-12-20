@@ -88,14 +88,14 @@ let countValidStars (matrix: char array list) =
                       // Mark diagonals if they are valid
                       diagonalPairs
                       |> List.iter (fun ((dx1, dy1), (dx2, dy2)) ->
-                          let pos1 = (x + dx1, y + dy1)
-                          let pos2 = (x + dx2, y + dy2)
+                          let x1, y1 = (x + dx1, y + dy1)
+                          let x2, y2 = (x + dx2, y + dy2)
 
-                          if isValidPosition pos1 then
-                              resultMatrix[fst pos1][snd pos1] <- matrix[fst pos1][snd pos1]
+                          if isValidPosition (x1, y1) then
+                              resultMatrix[x1][y1] <- matrix[x1][y1]
 
-                          if isValidPosition pos2 then
-                              resultMatrix[fst pos2][snd pos2] <- matrix[fst pos2][snd pos2])
+                          if isValidPosition (x2, y2) then
+                              resultMatrix[x2][y2] <- matrix[x2][y2])
 
                       yield 1 ]
         |> List.sum
@@ -103,7 +103,7 @@ let countValidStars (matrix: char array list) =
     count
 
 let part1 () =
-    findXMAS (read "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day4.txt")
+    findXMAS (readMatrix "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day4.txt")
 
 let part2 () =
-    countValidStars (read "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day4.txt")
+    countValidStars (readMatrix "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day4.txt")

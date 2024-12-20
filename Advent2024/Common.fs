@@ -68,4 +68,6 @@ type Coordinate =
 
     static member (+)(a: Coordinate, b: Coordinate) = { X = a.X + b.X; Y = a.Y + b.Y }
 
+    static member (-)(a: Coordinate, b: Coordinate) = { X = a.X - b.X; Y = a.Y - b.Y }
+
     override this.ToString() = $"X={this.X}, Y={this.Y}"

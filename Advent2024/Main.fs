@@ -38,6 +38,10 @@ let runDay7 () =
     printfn "Part 1: \n%A" (Day7.part1 ())
     printfn "Part 2: \n%A" (Day7.part2 ())
 
+let runDay8 () =
+    printfn "Day 8:"
+    printfn "Part 1: \n%A" (Day8.part1 ())
+
 let runDay9 () =
     printfn "Day 9:"
     printfn "Part 1: \n%A" (Day9.part1 ())
@@ -62,11 +66,16 @@ let runDay15 () =
     printfn "Part 1: \n%A" (Day15.part1 ())
     //printfn "Part 2: \n%A" (Day15.part2 ())
 
-
 let runDay16 () =
     printfn "Day 16:"
     printfn "Part 1: \n%A" (Day16.part1 ())
    // printfn "Part 2: \n%A" (Day16.part2 ())
+
+let runDay19 () =
+    printfn "Day 19:"
+    printfn "Part 1: \n%A" (Day19.part1 ())
+    printfn "Part 2: \n%A" (Day19.part2 ())
+
 
 [<EntryPoint>]
 let main argv =
@@ -81,12 +90,14 @@ let main argv =
         | 5 -> runDay5 ()
         | 6 -> runDay6 ()
         | 7 -> runDay7 ()
+        | 8 -> runDay8 ()
         | 9 -> runDay9 ()
         | 10 -> runDay10 ()
         | 13 -> runDay13 ()
         | 14 -> runDay14 ()
         | 15 -> runDay15 ()
         | 16 -> runDay16 ()
+        | 19 -> runDay19 ()
         | n -> printfn "Day %d not implemented" n
     | _ -> printfn "Usage: program.exe [day]"
 
