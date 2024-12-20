@@ -29,6 +29,17 @@ let findShortestPath (matrix: char array list) (startPos: Coordinate) (endPos: C
         let initialCost = if dir = Right then 0 else turnCost
         queue.Enqueue((startPos, dir, initialCost), initialCost)
 
+    // Update the distances when moving or turning
+    let moveOrTurn (moveOrTurnCost: int) (position: Coordinate) (currentCost: int) (direction: StandardDirection) =
+        let totalCost = currentCost + moveOrTurnCost
+
+        if totalCost < cost[position.X].[position.Y][direction.Index()] then
+            cost[position.X].[position.Y][direction.Index()] <- totalCost
+            queue.Enqueue((position, direction, totalCost), totalCost)
+
+    let move = moveOrTurn moveCost
+    let turn = moveOrTurn turnCost
+
     let rec processQueue () =
         if queue.Count = 0 then
             -1 // No path found
@@ -38,7 +49,7 @@ let findShortestPath (matrix: char array list) (startPos: Coordinate) (endPos: C
             if currentPos = endPos then
                 currentCost
             else
-                // Move forward in the current direction
+
                 let nextPos =
                     nextPositionStandard (currentPos.X, currentPos.Y) currentDir
                     |> Coordinate.Create
@@ -47,22 +58,11 @@ let findShortestPath (matrix: char array list) (startPos: Coordinate) (endPos: C
                     isValidPosition rows cols (nextPos.X, nextPos.Y)
                     && matrix[nextPos.X][nextPos.Y] <> '#'
                 then
-                    let newCost = currentCost + moveCost
-
-                    if newCost < cost[nextPos.X].[nextPos.Y][currentDir.Index()] then
-                        cost[nextPos.X].[nextPos.Y][currentDir.Index()] <- newCost
-                        queue.Enqueue((nextPos, currentDir, newCost), newCost)
+                    // move in the current direction
+                    move nextPos currentCost currentDir
 
                 // check if turning left or right gives us a shorter path
-                let turn (currentPos: Coordinate) (currentCost: int) (newDir: StandardDirection) =
-                    let totalCost = currentCost + turnCost
-
-                    if totalCost < cost[currentPos.X].[currentPos.Y][newDir.Index()] then
-                        cost[currentPos.X].[currentPos.Y][newDir.Index()] <- totalCost
-                        queue.Enqueue((currentPos, newDir, totalCost), totalCost)
-
                 turn currentPos currentCost (currentDir.TurnRight())
-
                 turn currentPos currentCost (currentDir.TurnLeft())
 
                 processQueue ()
