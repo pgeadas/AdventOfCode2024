@@ -2,22 +2,24 @@
 
 open System
 open System.Collections.Generic
+open System.IO
 open Microsoft.FSharp.Core
 
-let toInt (s: string) = s.Trim() |> int
+let filePath = "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day1.txt"
 
-let readAllLines () =
-    let rec readLines leftAcc rightAcc =
-        let input = Console.ReadLine()
+let readAllPairs filePath =
+    File.ReadLines(filePath)
+    |> Seq.fold
+        (fun (leftAcc, rightAcc) line ->
+            if not (String.IsNullOrWhiteSpace(line)) then
+                let parts = line.Split("  ", StringSplitOptions.RemoveEmptyEntries)
 
-        if String.IsNullOrWhiteSpace(input) then
-            leftAcc, rightAcc
-        else
-            match input.Split("  ") with
-            | [| value1; value2 |] -> readLines (toInt value1 :: leftAcc) (toInt value2 :: rightAcc)
-            | _ -> readLines leftAcc rightAcc
-
-    readLines [] []
+                match parts with
+                | [| value1; value2 |] -> (int value1 :: leftAcc, int value2 :: rightAcc)
+                | _ -> (leftAcc, rightAcc)
+            else
+                (leftAcc, rightAcc))
+        ([], [])
 
 let difference leftVal rightVal = abs (leftVal - rightVal)
 
@@ -40,7 +42,7 @@ let calculate leftValues rightValues =
     |> List.sum
 
 let part1 () =
-    let leftValues, rightValues = readAllLines ()
+    let leftValues, rightValues = readAllPairs filePath
 
     let sortedLeft = leftValues |> List.sort
     let sortedRight = rightValues |> List.sort
@@ -50,9 +52,8 @@ let part1 () =
         |> List.map (fun (left, right) -> difference left right)
         |> List.sum
 
-    printfn $"%d{sumDifferences}"
+    sumDifferences
 
 let part2 () =
-    let leftValues, rightValues = readAllLines ()
-    let result = calculate leftValues rightValues
-    printfn $"%d{result}"
+    let leftValues, rightValues = readAllPairs filePath
+    calculate leftValues rightValues
