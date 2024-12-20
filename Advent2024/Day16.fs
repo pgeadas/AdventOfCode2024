@@ -180,12 +180,7 @@ let part2 () =
     | Some(cost, paths) ->
 
         // Get the unique positions of the paths
-        let uniquePositions = HashSet<Coordinate>()
-
-        paths
-        |> List.collect id
-        |> List.map fst
-        |> List.iter (fun pos -> uniquePositions.Add(pos) |> ignore)
+        let uniquePositions = paths |> List.collect id |> List.map fst |> Set.ofList
 
         // part1 and part2
         cost, uniquePositions.Count

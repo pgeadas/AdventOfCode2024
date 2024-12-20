@@ -36,7 +36,7 @@ let part1 () =
     |> List.filter (fun b -> b = true)
     |> List.length
 
-// Using lists to track the solutions takes too long, even when using memoization
+// Storing the full solutions takes too long, even when using memoization
 let rec findAllWays target (patterns: string array) currentSolution solutions =
     if target = "" then
         currentSolution :: solutions

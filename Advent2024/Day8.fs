@@ -4,6 +4,7 @@ open System.Collections.Generic
 open Advent2024.Common
 open Advent2024.Matrix
 
+// WIP
 let group (matrix: char array list) =
     let dict = Dictionary<char, Coordinate list>()
 

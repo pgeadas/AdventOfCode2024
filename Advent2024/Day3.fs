@@ -1,20 +1,12 @@
 module Advent2024.Day3
 
-open System
+open System.IO
 open System.Text.RegularExpressions
 
 let pattern = Regex("mul\((\d{1,3}),(\d{1,3})\)")
+let filePath = "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day3.txt"
 
-let readAllLinesFromConsole =
-    let rec readLines content =
-        let line = Console.ReadLine()
-
-        if String.IsNullOrWhiteSpace(line) then
-            content
-        else
-            readLines (content + line)
-
-    readLines ""
+let readAllLinesFromFile filePath = File.ReadAllText(filePath)
 
 let getAllMatches (regex: Regex) input =
     let matches = regex.Matches(input)
@@ -27,13 +19,15 @@ let getAllMatches (regex: Regex) input =
 let multAndSum list =
     list |> List.map (fun (a, b) -> a * b) |> List.sum
 
-let part1 () =
-    let input = readAllLinesFromConsole
+let executePart1 (input: string) =
     let matches = getAllMatches pattern input
     multAndSum matches
 
-let part2 () =
-    let input = readAllLinesFromConsole
+let part1 () =
+    let input = readAllLinesFromFile filePath
+    executePart1 input
+
+let executePart2 (input: string) =
     let mutable parsingEnabled = true // Initially enabled to capture initial `mul`
     let mutable results = []
     let mutable index = 0
@@ -60,3 +54,7 @@ let part2 () =
             index <- index + 1
 
     results |> multAndSum
+
+let part2 () =
+    let input = readAllLinesFromFile filePath
+    executePart2 input
