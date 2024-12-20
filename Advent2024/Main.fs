@@ -64,12 +64,12 @@ let runDay14 () =
 let runDay15 () =
     printfn "Day 15:"
     printfn "Part 1: \n%A" (Day15.part1 ())
-    //printfn "Part 2: \n%A" (Day15.part2 ())
+//printfn "Part 2: \n%A" (Day15.part2 ())
 
 let runDay16 () =
     printfn "Day 16:"
     printfn "Part 1: \n%A" (Day16.part1 ())
-   // printfn "Part 2: \n%A" (Day16.part2 ())
+    printfn "Part 2: \n%A" (Day16.part2 ())
 
 let runDay19 () =
     printfn "Day 19:"
