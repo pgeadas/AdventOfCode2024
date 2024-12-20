@@ -128,15 +128,15 @@ let readAndFindAllInt filePath targetChar =
 
     readAndFindAll filePath targetChar charToDigit
 
-let read filePath =
+let readMatrix filePath =
 
     let processLine matrix line =
         if String.IsNullOrWhiteSpace(line) then
             List.rev matrix
         else
-            (Array.ofSeq line :: matrix)
+           (Array.ofSeq line :: matrix)
 
-    File.ReadLines(filePath) |> Seq.fold processLine []
+    File.ReadLines(filePath) |> Seq.fold processLine [] |> List.rev
 
 /// <summary>
 /// Calculates the size of the given matrix.
