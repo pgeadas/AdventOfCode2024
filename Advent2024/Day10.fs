@@ -61,7 +61,7 @@ let part1 () =
         |> Seq.collect _.Value
         |> Seq.map (fun path -> (List.last path, List.head path)) // Get (start, end) pairs
         |> Set.ofSeq // Convert to set to count unique pairs
-        |> Set.count // Count unique start-end combinations
+        |> Set.count
 
     uniquePathCount
 

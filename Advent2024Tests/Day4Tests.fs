@@ -1,7 +1,10 @@
 module Advent2024Tests.Day4Tests
 
+open Advent2024
 open Expecto
-open Advent2024.Day4
+open Matrix
+
+let filePath = "/Users/pgeadas/RiderProjects/Advent2024/Advent2024Tests/inputs/Day4Test.txt"
 
 let part1Tests =
     testList
@@ -18,14 +21,13 @@ let part1Tests =
                     SMSMSASXSS
                     SAXAMASAAA
                     MAMMMXMMMM
-                    MXMXAXMASX
-                    MMAMMMMMMM"""
+                    MXMXAXMASX"""
 
               let expected =
                   input().Split('\n')
                   |> Array.toList
-                  |> List.map (fun line -> line.Trim().ToCharArray() |> Array.toList)
+                  |> List.map _.Trim().ToCharArray()
 
-              let result = readAllLines input
+              let result = readMatrix filePath
               Expect.equal result expected "Should return the correct result for part1"
           } ]

@@ -22,21 +22,24 @@ let countFileNumber currentIndex = currentIndex |> string |> _.Length
 
 let compact input dots =
     let input = input |> Array.ofList
+    let result = ResizeArray<string>()
 
-    let rec compact array currIndex lastIndex (acc: string list) =
+    let rec compact currIndex lastIndex =
         if currIndex >= Array.length input - dots then
-            acc
+            result |> List.ofSeq
         elif input[currIndex] = "." then
             let lastValue = input[lastIndex]
 
             if lastValue = "." then
-                compact array currIndex (lastIndex - 1) acc
+                compact currIndex (lastIndex - 1)
             else
-                compact array (currIndex + 1) (lastIndex - 1) (acc @ [ lastValue ])
+                result.Add(lastValue)
+                compact (currIndex + 1) (lastIndex - 1)
         else
-            compact array (currIndex + 1) lastIndex (acc @ [ input[currIndex] ])
+            result.Add(input[currIndex])
+            compact (currIndex + 1) lastIndex
 
-    compact input 0 (input.Length - 1) []
+    compact 0 (input.Length - 1)
 
 let checksum (input: string list) : uint64 =
     input

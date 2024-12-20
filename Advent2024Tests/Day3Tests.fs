@@ -19,7 +19,7 @@ let part1Tests =
                   "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))"
 
               let expected = 161
-              let result = part1 input
+              let result = executePart1 input
               Expect.equal result expected "Should return the correct result for part1"
           } ]
 
@@ -32,6 +32,6 @@ let part2Tests =
                    "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
 
               let expected = 48
-              let result = part2 input
+              let result = executePart2 input
               Expect.equal result expected "Should return the correct result for part2"
           } ]
