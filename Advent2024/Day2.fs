@@ -1,21 +1,23 @@
 module Advent2024.Day2
 
 open System
+open System.IO
+
+let filePath = "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day2.txt"
 
 let parseLineToNumbers (line: string) =
     line.Split(' ') |> Array.map int |> List.ofArray
 
-let readAllLinesFromConsole =
-    let rec readLines matrix =
-        let input = Console.ReadLine()
+let readMatrix filePath =
 
-        if String.IsNullOrWhiteSpace(input) then
+    let processLine matrix line =
+        if String.IsNullOrWhiteSpace(line) then
             List.rev matrix
         else
-            let values = parseLineToNumbers input
-            readLines (values :: matrix)
+            let values = parseLineToNumbers line
+            (values :: matrix)
 
-    readLines []
+    File.ReadLines(filePath) |> Seq.fold processLine [] |> List.rev
 
 let isStrictlyOrdered comparison lst =
     List.pairwise lst
@@ -43,11 +45,9 @@ let canBeMadeSafe lst =
         List.indexed lst |> List.exists (fun (i, _) -> isSafe (removeAt i lst))
 
 let part1 () =
-    let matrix = readAllLinesFromConsole
-    let result = countSelectedRows matrix
-    printfn $"%d{result}"
+    let matrix = readMatrix filePath
+    countSelectedRows matrix
 
 let part2 () =
-    let matrix = readAllLinesFromConsole
-    let result = matrix |> List.filter canBeMadeSafe |> List.length
-    printfn $"%d{result}"
+    let matrix = readMatrix filePath
+    matrix |> List.filter canBeMadeSafe |> List.length
