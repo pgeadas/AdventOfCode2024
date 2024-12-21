@@ -41,6 +41,7 @@ let runDay7 () =
 let runDay8 () =
     printfn "Day 8:"
     printfn "Part 1: \n%A" (Day8.part1 ())
+    printfn "Part 2: \n%A" (Day8.part2 ())
 
 let runDay9 () =
     printfn "Day 9:"
