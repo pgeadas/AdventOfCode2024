@@ -10,8 +10,6 @@ let rotate90 direction =
     | Down -> Left
     | Left -> Up
 
-let directions = [| Right; Left; Up; Down |]
-
 let part1 () =
     let matrix, startPosition =
         readAndFindFirst "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day6.txt" '^'

@@ -6,8 +6,6 @@ open Advent2024.Matrix
 
 let filePath = "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day10.txt"
 
-let directions = [| Right; Left; Up; Down |]
-
 let findAllPaths (matrix: int array list) (startPositions: (int * int) list) =
     let rows, cols = matrixSize matrix
     let allPaths = Dictionary<int * int, (int * int) list list>()
@@ -28,7 +26,7 @@ let findAllPaths (matrix: int array list) (startPositions: (int * int) list) =
 
             let mutable keepSearching = false
 
-            for direction in directions do
+            for direction in StandardDirection.Values do
                 let nextPos = nextPositionStandard currentPos direction
                 let nextX, nextY = nextPos
 

@@ -12,6 +12,7 @@ let main argv =
               Day2Tests.readAllLinesTests
               Day3Tests.part1Tests
               Day3Tests.part2Tests
-              Day4Tests.part1Tests ]
+              Day4Tests.part1Tests
+              Day21Tests.tests ]
 
     runTestsWithCLIArgs [] argv allTests

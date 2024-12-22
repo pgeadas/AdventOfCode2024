@@ -26,7 +26,7 @@ let difference leftVal rightVal = abs (leftVal - rightVal)
 let countAppearances num list =
     list |> List.filter ((=) num) |> List.length
 
-let getOrMultiply key (map: Dictionary<int, int>) list =
+let getOrMultiply (map: Dictionary<int, int>) list key =
     if map.ContainsKey(key) then
         map[key]
     else
@@ -36,10 +36,7 @@ let getOrMultiply key (map: Dictionary<int, int>) list =
 
 let calculate leftValues rightValues =
     let map = Dictionary<int, int>()
-
-    leftValues
-    |> List.map (fun value -> getOrMultiply value map rightValues)
-    |> List.sum
+    leftValues |> List.map (getOrMultiply map rightValues) |> List.sum
 
 let part1 () =
     let leftValues, rightValues = readAllPairs filePath

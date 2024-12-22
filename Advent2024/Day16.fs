@@ -11,18 +11,16 @@ type Cost = int
 let turnCost: Cost = 1000
 let moveCost: Cost = 1
 
-let directions = [| Up; Down; Left; Right |]
-
 let findShortestPathCost (matrix: char array list) (startPos: Coordinate) (endPos: Coordinate) =
     let rows, cols = matrixSize matrix
 
     let cost =
-        Array.init rows (fun _ -> Array.init cols (fun _ -> Array.create directions.Length Int32.MaxValue))
+        Array.init rows (fun _ -> Array.init cols (fun _ -> Array.create StandardDirection.Count Int32.MaxValue))
 
     let queue = PriorityQueue<Coordinate * StandardDirection * Cost, int>()
 
     // Enqueue initial positions for all directions
-    for dir in directions do
+    for dir in StandardDirection.Values do
         // initial cost for reaching the start position from each direction
         cost[startPos.X].[startPos.Y][dir.Index()] <- 0
         // the starting direction is Right, others imply a rotation
@@ -84,17 +82,17 @@ let findShortestPaths (matrix: char array list) (startPos: Coordinate) (endPos: 
     let rows, cols = matrixSize matrix
 
     let cost =
-        Array.init rows (fun _ -> Array.init cols (fun _ -> Array.create directions.Length Int32.MaxValue))
+        Array.init rows (fun _ -> Array.init cols (fun _ -> Array.create StandardDirection.Count Int32.MaxValue))
 
     // Track multiple predecessors for each position/direction
     let predecessors =
         Array.init rows (fun _ ->
-            Array.init cols (fun _ -> Array.init directions.Length (fun _ -> ResizeArray<Coordinate * StandardDirection>())))
+            Array.init cols (fun _ -> Array.init StandardDirection.Count (fun _ -> ResizeArray<Coordinate * StandardDirection>())))
 
     let queue = PriorityQueue<Coordinate * StandardDirection * Cost, int>()
 
     // Initialize queue
-    for dir in directions do
+    for dir in StandardDirection.Values do
         cost[startPos.X].[startPos.Y][dir.Index()] <- 0
         let initialCost = if dir = Right then 0 else turnCost
         queue.Enqueue((startPos, dir, initialCost), initialCost)
