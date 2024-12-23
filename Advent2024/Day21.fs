@@ -39,24 +39,6 @@ let readAllLines filePath =
     File.ReadLines(filePath)
     |> Seq.filter (fun line -> not (String.IsNullOrWhiteSpace(line)))
 
-// let createAdjacencyMatrix (keypad: Keypad) =
-//     let rows, cols = keypad.Length, keypad.[0].Length
-//
-//     let adjacency =
-//         Array.init rows (fun x ->
-//             Array.init cols (fun y ->
-//                 Array.init StandardDirection.Count (fun index ->
-//                     // Make sure we respect the index order defined in StandardDirection
-//                     let direction, _ = StandardDirection.Indexed[index]
-//                     let adjX, adjY = nextPositionStandard (x, y) direction
-//
-//                     if isValidPosition rows cols (adjX, adjY) && keypad[adjX].[adjY] <> '#' then
-//                         Some keypad[adjX].[adjY]
-//                     else
-//                         None)))
-//
-//     adjacency
-
 type Cost = int
 let moveCost: Cost = 1
 
@@ -74,20 +56,20 @@ let findShortestPaths (matrix: char array list) (startPos: Coordinate) (endPos: 
     cost[startPos.X].[startPos.Y] <- 0
     queue.Enqueue((startPos, 0), 0)
 
-    let move (position: Coordinate) (currentCost: Cost) (fromPos: Coordinate) =
+    let move (nextPos: Coordinate) (currentCost: Cost) (fromPos: Coordinate) =
         let totalCost = currentCost + moveCost
-        let currentBestCost = cost[position.X].[position.Y]
+        let currentBestCost = cost[nextPos.X].[nextPos.Y]
 
         if totalCost <= currentBestCost then
 
             if totalCost < currentBestCost then
-                cost[position.X].[position.Y] <- totalCost
+                cost[nextPos.X].[nextPos.Y] <- totalCost
                 // If this is a new best cost, clear previous predecessors
-                predecessors[position.X].[position.Y].Clear()
-                queue.Enqueue((position, totalCost), totalCost)
+                predecessors[nextPos.X].[nextPos.Y].Clear()
+                queue.Enqueue((nextPos, totalCost), totalCost)
 
             // Add the new path to predecessors, since it is a new best cost
-            predecessors[position.X].[position.Y].Add(fromPos)
+            predecessors[nextPos.X].[nextPos.Y].Add(fromPos)
 
     let rec processQueue () =
         if queue.Count = 0 then
@@ -107,20 +89,30 @@ let findShortestPaths (matrix: char array list) (startPos: Coordinate) (endPos: 
 
                 processQueue ()
 
+    let fromDirection direction =
+        match direction with
+        | Up -> '^'
+        | Right -> '>'
+        | Down -> 'v'
+        | Left -> '<'
+
     // Reconstruct all paths from predecessors
-    let rec buildPaths pos =
+    let rec buildPaths (pos, prevDir) =
         let predList = predecessors[pos.X].[pos.Y]
 
         if predList.Count = 0 then
-            [ [ pos ] ]
+            [ [ pos, prevDir ] ]
         else
             [ for prevPos in predList do
-                  for path in buildPaths prevPos do
-                      yield pos :: path ]
+                  for path in buildPaths (prevPos, prevDir) do
+                      let previousDir = inferDirection (pos.X, pos.Y) (prevPos.X, prevPos.Y)
+                      let prevDir = fromDirection previousDir
+                      yield (pos, prevDir) :: path ]
 
     match processQueue () with
-    | Some(cost, endPos) ->
-        let paths = (buildPaths endPos) // we need to return all paths, because even though they have the same cost, the order of presses will influence the next robot (because of the keypad order)
+    | Some(_, endPos) ->
+        // we need to return all paths, because even though they have the same cost, the order of presses will influence the next robot (because of the keypad order)
+        let paths = (buildPaths (endPos, ' '))
         Some(paths)
     | None -> None
 
@@ -141,28 +133,13 @@ let findShortestPathsForTuples keypad startAndEndPos =
     |> List.map (fun (startPos, endPos) -> findShortestPaths (List.ofSeq keypad) startPos endPos)
     |> List.choose id
 
-let buildInstructionsList paths =
-    let fromDirection direction =
-        match direction with
-        | Up -> '^'
-        | Right -> '>'
-        | Down -> 'v'
-        | Left -> '<'
-
-    let buildPath (path: Coordinate list) =
-        path
-        |> List.pairwise
-        |> List.map (fun (coord1, coord2) ->
-            let previousDir = inferDirection (coord1.X, coord1.Y) (coord2.X, coord2.Y)
-            fromDirection previousDir)
-
-    let res = paths |> List.map (fun pathList -> pathList |> List.map buildPath)
-
-    let mergeChars (chars: char list) =
-        ("A", chars) ||> List.fold (fun acc char -> string char + acc)
+let buildInstructionsList (paths: (Coordinate * char) list list list) =
+    let mergeChars (chars: (Coordinate * char) list) =
+        ("A", chars)
+        ||> List.fold (fun acc (_, char) -> if char <> ' ' then string char + acc else acc)
 
     // we get the list of possible min paths with A appended
-    res |> List.map (fun path -> path |> List.map mergeChars)
+    paths |> List.map (List.map mergeChars)
 
 let rec permuteNestedLists nestedLists =
     match nestedLists with
@@ -172,83 +149,55 @@ let rec permuteNestedLists nestedLists =
         // Combine each element of the head list with permutations of the tail
         head |> List.collect (fun h -> tailPermutations |> List.map (fun t -> h :: t))
 
-let filterStringsBySize (stringLists: string list list) (sizes: int list) =
-    if List.length stringLists <> List.length sizes then
-        failwith "The number of string lists and size specifications must match."
-
-    List.zip stringLists sizes
-    |> List.map (fun (stringList, size) ->
-        // Filter each string in the sublist based on the specified size
-        stringList |> List.filter (fun str -> String.length str = size))
-
 let concatInstructions (instructions: string list list list) =
-    instructions
-    |> List.map (fun list -> list |> List.map (fun list -> list |> String.concat ""))
+    instructions |> List.map (List.map (String.concat ""))
 
-let doStuff lookupTable (codes: string list list) =
+let calculateMoves lookupTable (codes: string list list) =
     let prependedNumPadInstructions = codes |> List.map prependA
 
     let startEndPosGroups =
         prependedNumPadInstructions |> List.map (toStartEndPosGroups lookupTable)
 
     let paths =
-        startEndPosGroups
-        |> List.map (fun list -> list |> List.map (fun list -> list |> findShortestPathsForTuples dirKeypad))
-
-    let instructionsList =
-        paths |> List.map (fun list -> list |> List.map permuteNestedLists)
+        startEndPosGroups |> List.map (List.map (findShortestPathsForTuples dirKeypad))
 
     let instructions =
-        instructionsList
-        |> List.map (fun list -> list |> List.map buildInstructionsList)
+        paths
+        |> List.map (List.map permuteNestedLists)
+        |> List.map (List.map buildInstructionsList)
+        |> List.map concatInstructions
+        |> List.map (List.collect id)
 
-    let result =
-        instructions
-        |> List.map (fun list -> list |> concatInstructions)
-        |> List.map (fun list -> list |> List.collect id)
+    let minSizes = instructions |> List.map (List.map _.Length) |> List.min
 
-    let minSizes =
-        result |> List.map (fun list -> list |> List.map _.Length |> List.min)
+    instructions
+    |> List.mapi (fun i list -> list |> List.filter (fun s -> s.Length = minSizes.Item(i)))
 
-    printfn "minSizes: %A" minSizes
-
-    let result =
-        result
-        |> List.mapi (fun i list -> list |> List.filter (fun s -> s.Length = minSizes.Item(i)))
-
-    printfn "%A" result
-    result
-
+// TODO: Use memoization, it is a bit slow but still works!
 let part1 () =
     let codes = readAllLines filePath
     let prependedCodes = codes |> Seq.toList |> prependA
     let startEndPosGroups = toStartEndPosGroups numpadLookup prependedCodes
-
     let paths = startEndPosGroups |> List.map (findShortestPathsForTuples numKeypad)
 
     let numPadInstructions =
-        paths |> List.map permuteNestedLists |> List.map buildInstructionsList
+        paths
+        |> List.map permuteNestedLists
+        |> List.map buildInstructionsList
+        |> concatInstructions
 
-    let res = numPadInstructions |> concatInstructions
+    let keypad1Instructions = calculateMoves dirpadLookup numPadInstructions
+    let keypad2Instructions = calculateMoves dirpadLookup keypad1Instructions
 
-    printfn "%A" res
-    let minSizes = res |> List.map (fun list -> list |> List.map _.Length |> List.min)
-
-    printfn "min1: %A" minSizes
-
-    let robot2 = doStuff dirpadLookup res
-
-    let robot3 = doStuff dirpadLookup robot2
-
-    let nums =
+    let codeValues =
         codes
         |> Seq.map (fun code -> code.Substring(0, code.Length - 1) |> int)
         |> Seq.toList
 
     let minSizes =
-        robot3 |> List.map (fun list -> list |> List.map _.Length |> List.min)
+        keypad2Instructions
+        |> List.map (fun list -> list |> List.map _.Length |> List.min)
 
-    printfn "min3: %A" minSizes
-    printfn "%A" nums
-
-    List.zip minSizes nums |> List.map (fun (size, num) -> size * num) |> List.sum
+    List.zip minSizes codeValues
+    |> List.map (fun (size, num) -> size * num)
+    |> List.sum

@@ -30,9 +30,8 @@ let readResults filePath =
     File.ReadAllLines(filePath) |> Array.map parseLine |> Array.toList
 
 let mergeNumbers (a: uint64) (b: uint64) =
-    let rec countDigits (n:uint64) =
-        if n < 10UL then 1
-        else 1 + countDigits (n / 10UL)
+    let rec countDigits (n: uint64) =
+        if n < 10UL then 1 else 1 + countDigits (n / 10UL)
 
     let digitsInB = countDigits b
     let factor = uint64 (pown 10 digitsInB)
@@ -44,15 +43,15 @@ let applyOperation (a: uint64) (b: uint64) operation =
     | Multiply -> a * b
     | Merge -> mergeNumbers a b
 
-let rec permutateOperations length operations =
+let rec permuteOperations length operations =
     match length with
     | 1 -> operations |> List.map (fun op -> [ op ])
     | _ ->
         operations
-        |> List.collect (fun op -> permutateOperations (length - 1) operations |> List.map (fun ops -> op :: ops))
+        |> List.collect (fun op -> permuteOperations (length - 1) operations |> List.map (fun ops -> op :: ops))
 
 let calculateValues operations (components: Component list) =
-    let permutations = permutateOperations (List.length components - 1) operations
+    let permutations = permuteOperations (List.length components - 1) operations
 
     permutations
     |> List.map (fun ops ->
