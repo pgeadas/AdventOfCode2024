@@ -137,11 +137,23 @@ let toInstructionsList (paths: (Coordinate * char) list list list) =
     // we get the list of possible min paths with A appended
     paths |> List.map (List.map mergeChars)
 
+let toInstructionsList2 (paths: (Coordinate * char) list list option) =
+    let mergeChars (chars: (Coordinate * char) list) =
+        ("A", chars)
+        ||> List.fold (fun acc (_, char) -> if char <> ' ' then string char + acc else acc)
+
+    // we get the list of possible min paths with A appended
+    match paths with
+    | Some paths -> paths |> (List.map mergeChars)
+    | None -> []
+
 let findShortestPathsForTuples keypad startAndEndPos =
     startAndEndPos
     |> List.map (fun (startPos, endPos) -> findShortestPaths (List.ofSeq keypad) startPos endPos)
     |> List.choose id
     |> toInstructionsList
+
+let cache = Dictionary<Coordinate * Coordinate * Type, string list>()
 
 let rec permuteNestedLists (nestedLists: string list list) =
     let permutations =
@@ -153,6 +165,28 @@ let rec permuteNestedLists (nestedLists: string list list) =
             head |> List.collect (fun h -> tailPermutations |> List.map (fun t -> h :: t))
 
     permutations
+
+let findShortestPathsForTuplesMemoized keypad startAndEndPos =
+    startAndEndPos
+    |> List.map (fun (startPos, endPos) ->
+        match cache.TryGetValue((startPos, endPos, keypad.GetType())) with
+        | true, value -> value
+        | false, _ ->
+            let path = findShortestPaths (List.ofSeq keypad) startPos endPos
+            let instructions = toInstructionsList2 path
+            cache.Add((startPos, endPos, keypad.GetType()), instructions)
+            instructions)
+
+let findShortestPathsForTuplesMemoized2 keypad startAndEndPos =
+    startAndEndPos
+    |> List.map (fun (startPos, endPos) ->
+        match cache.TryGetValue((startPos, endPos, keypad.GetType())) with
+        | true, value -> value
+        | false, _ ->
+            let path = findShortestPaths (List.ofSeq keypad) startPos endPos
+            let instructions = toInstructionsList2 path
+            cache.Add((startPos, endPos, keypad.GetType()), instructions)
+            instructions)
 
 let concatInstructions (instructions: string list list list) =
     instructions |> List.map (List.map (String.concat ""))
@@ -167,7 +201,8 @@ let calculateMoves lookupTable (codes: string list list) =
         prependedNumPadInstructions |> List.map (toStartEndPosGroups lookupTable)
 
     let paths =
-        startEndPosGroups |> List.map (List.map (findShortestPathsForTuples dirKeypad))
+        startEndPosGroups
+        |> List.map (List.map (findShortestPathsForTuplesMemoized dirKeypad))
 
     let instructions =
         paths

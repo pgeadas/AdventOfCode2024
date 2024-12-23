@@ -2,6 +2,8 @@
 
 module Advent2024.Main
 
+open System.Diagnostics
+
 let runDay1 () =
     printfn "Day 1:"
     printfn "Part 1: \n%A" (Day1.part1 ())
@@ -78,8 +80,11 @@ let runDay19 () =
     printfn "Part 2: \n%A" (Day19.part2 ())
 
 let runDay21 () =
+    let stopwatch = Stopwatch.StartNew()
     printfn "Day 21:"
     printfn "Part 1: \n%A" (Day21.part1 ())
+    stopwatch.Stop()
+    printfn "Time elapsed: %A" stopwatch.Elapsed
 
 
 [<EntryPoint>]
