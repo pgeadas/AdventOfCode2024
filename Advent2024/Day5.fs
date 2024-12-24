@@ -2,34 +2,33 @@ module Advent2024.Day5
 
 open System
 open System.Collections.Generic
+open System.IO
 open Advent2024.Node
 
-let readAllLines readLineFn =
-    let rec readLines list =
-        let input = readLineFn ()
+let filePath = "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day5.txt"
 
-        if String.IsNullOrWhiteSpace(input) then
-            List.rev list
-        else
-            let toPair (arr: string array) = arr[0], arr[1]
+let readAndTransform filePath =
+    let rec splitOnEmptyLine remaining acc =
+        match remaining with
+        | [] -> (List.rev acc, [])
+        | line :: rest ->
+            if String.IsNullOrWhiteSpace(line) then
+                (acc, rest)
+            else
+                splitOnEmptyLine rest (line :: acc)
 
-            let values = input.Trim().Split('|') |> toPair
-            readLines (values :: list)
+    let lines = File.ReadLines filePath |> Seq.toList
 
-    readLines []
+    let toPair (arr: string array) = arr[0], arr[1]
+    let transformBefore (line: string) = line.Trim().Split('|') |> toPair
+    let transformAfter (line: string) = line.Trim().Split(',') |> List.ofArray
 
-let readInstructions readLineFn =
-    let rec readLines list =
-        let input = readLineFn ()
+    let beforeEmptyLine, afterEmptyLine = splitOnEmptyLine lines []
 
-        if String.IsNullOrWhiteSpace(input) then
-            List.rev list
-        else
-            let values = input.Trim().Split(',') |> List.ofArray
-            readLines (values :: list)
+    let pairs = beforeEmptyLine |> List.map transformBefore
+    let instructions = afterEmptyLine |> List.map transformAfter
 
-    readLines []
-
+    (pairs, instructions)
 
 let toNodes1 (pageOrderings: (string * string) list) =
     pageOrderings
@@ -126,8 +125,7 @@ let fixInstruction (instruction: Node<string> list) (topologicalSortedMap: Map<s
     instruction |> List.sortBy (fun node -> topologicalSortedMap[node.Value])
 
 let part1 () =
-    let pageOrderings = readAllLines Console.ReadLine
-    let instructions = readInstructions Console.ReadLine
+    let pageOrderings, instructions = readAndTransform filePath
     let nodesPageOrderings = toNodes1 pageOrderings
     let nodesInstructions = toNodes2 instructions
 
