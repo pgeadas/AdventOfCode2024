@@ -4,6 +4,13 @@ module Advent2024.Main
 
 open System.Diagnostics
 
+let executeTimed (f: unit -> 'a) =
+    let stopwatch = Stopwatch.StartNew()
+    let result = f ()
+    stopwatch.Stop()
+    printfn "%A" result
+    printfn "Time elapsed: %A" stopwatch.Elapsed
+
 let runDay1 () =
     printfn "Day 1:"
     printfn "Part 1: \n%A" (Day1.part1 ())
@@ -80,12 +87,16 @@ let runDay19 () =
     printfn "Part 2: \n%A" (Day19.part2 ())
 
 let runDay21 () =
-    let stopwatch = Stopwatch.StartNew()
     printfn "Day 21:"
-    printfn "Part 1: \n%A" (Day21.part1 ())
-    stopwatch.Stop()
-    printfn "Time elapsed: %A" stopwatch.Elapsed
+    printf "Part 1:"
+    executeTimed Day21.part1
 
+let runDay23 () =
+    printfn "Day 23:"
+    printf "Part 1: "
+    executeTimed Day23.part1
+    printf "Part 2: "
+    executeTimed Day23.part2
 
 [<EntryPoint>]
 let main argv =
@@ -109,6 +120,7 @@ let main argv =
         | 16 -> runDay16 ()
         | 19 -> runDay19 ()
         | 21 -> runDay21 ()
+        | 23 -> runDay23 ()
         | n -> printfn "Day %d not implemented" n
     | _ -> printfn "Usage: program.exe [day]"
 
