@@ -112,6 +112,10 @@ let runDay23 () =
     printf "Part 2: "
     executeTimed Day23.part2
 
+let runDay25 () =
+    printf "Part 1: "
+    executeTimed Day25.part1
+
 [<EntryPoint>]
 let main argv =
     match argv with
@@ -138,6 +142,7 @@ let main argv =
         | 19 -> runDay19 ()
         | 21 -> runDay21 ()
         | 23 -> runDay23 ()
+        | 25 -> runDay25 ()
         | n -> printfn "Day %d not implemented" n
     | _ -> printfn "Usage: program.exe [day]"
 
