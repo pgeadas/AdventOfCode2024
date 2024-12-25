@@ -70,6 +70,12 @@ let runDay10 () =
     printfn "Part 2: "
     executeTimed Day10.part2
 
+let runDay11 () =
+    printfn "Part 1: "
+    executeTimed Day11.part1
+    printfn "Part 2: "
+    //executeTimed Day11.part2
+
 let runDay13 () =
     printfn "Part 1: "
     executeTimed Day13.part1
@@ -124,6 +130,7 @@ let main argv =
         | 8 -> runDay8 ()
         | 9 -> runDay9 ()
         | 10 -> runDay10 ()
+        | 11 -> runDay11 ()
         | 13 -> runDay13 ()
         | 14 -> runDay14 ()
         | 15 -> runDay15 ()
