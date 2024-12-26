@@ -45,6 +45,8 @@ let runDay5 () =
 let runDay6 () =
     printfn "Part 1: "
     executeTimed Day6.part1
+    printfn "Part 2: "
+    executeTimed Day6.part2
 
 let runDay7 () =
     printfn "Part 1: "
