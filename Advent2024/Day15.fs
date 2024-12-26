@@ -3,19 +3,11 @@ module Advent2024.Day15
 open Advent2024.Common
 open Advent2024.Matrix
 
-let toDirection direction =
-    match direction with
-    | '^' -> Up
-    | '>' -> Right
-    | '<' -> Left
-    | 'v' -> Down
-    | _ -> failwith "Invalid direction"
-
 let groupAndCount (input: char array) =
     input
     |> Array.fold
         (fun acc c ->
-            let direction = toDirection c
+            let direction = StandardDirection.FromChar(c)
 
             match acc with
             | (prevChar, count) :: tail when prevChar = direction -> (prevChar, count + 1) :: tail

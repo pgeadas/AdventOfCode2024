@@ -99,16 +99,7 @@ let findShortestPaths (matrix: char array list) (startPos: Coordinate) (endPos: 
             [ for prevPos in predList do
                   for path in buildPaths (prevPos, prevDir) do
                       let previousDir = inferDirection (pos.X, pos.Y) (prevPos.X, prevPos.Y)
-
-                      let fromDirection direction =
-                          match direction with
-                          | Up -> '^'
-                          | Right -> '>'
-                          | Down -> 'v'
-                          | Left -> '<'
-
-                      let prevDir = fromDirection previousDir
-                      yield (pos, prevDir) :: path ]
+                      yield (pos, previousDir.ToChar()) :: path ]
 
     match processQueue () with
     | Some(_, endPos) ->

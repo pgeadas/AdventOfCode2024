@@ -16,13 +16,13 @@ let readAndTransform filePath =
             else
                 readUntilEmptyLine rest (line :: acc)
 
-    let isLock (firstLine: string) = firstLine.StartsWith('#')
-
     let rec readNextKeyOrLock remaining (keys: string list list) (locks: string list list) =
+        let isLock (firstLine: string) = firstLine.StartsWith('#')
+
         match remaining with
         | [] -> (keys, locks)
+        // drop first line since we don't need it, passing only the rest
         | line :: rest ->
-            // drop first line since we don't need it, passing only the rest
             if isLock line then
                 let newLock, rest = readUntilEmptyLine rest []
                 readNextKeyOrLock rest keys (newLock :: locks)

@@ -3,9 +3,9 @@ module Advent2024.Day23
 open System.Collections.Generic
 open System.IO
 
-type Node = string
-
 let filePath = "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day23.txt"
+
+type Node = string
 
 let createNodeMap (filePath: string) =
     let parseLine (line: string) =
@@ -44,7 +44,7 @@ let findTripleConnectedNodes (nodeMap: Dictionary<Node, ResizeArray<Node>>) =
                     let neighbor1 = neighbors[i]
                     let neighbor2 = neighbors[j]
 
-                    // check if it is not removed already
+                    // check if it is not processed already
                     if nodeMap.ContainsKey(neighbor1) && nodeMap.ContainsKey(neighbor2) then
                         let neighbors1 = nodeMap[neighbor1]
                         let neighbors2 = nodeMap[neighbor2]
@@ -62,11 +62,11 @@ let findTripleConnectedNodes (nodeMap: Dictionary<Node, ResizeArray<Node>>) =
     triples
 
 let filterTriplesBy (letter: string) (connectedTriples: seq<Node * Node * Node>) =
-    let startsWithT (node: Node) = node.StartsWith(letter)
+    let startsWithLetter (node: Node) = node.StartsWith(letter)
 
     seq {
         for node, neighbor1, neighbor2 in connectedTriples do
-            if startsWithT node || startsWithT neighbor1 || startsWithT neighbor2 then
+            if startsWithLetter node || startsWithLetter neighbor1 || startsWithLetter neighbor2 then
                 yield (node, neighbor1, neighbor2)
     }
 

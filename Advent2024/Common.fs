@@ -27,6 +27,21 @@ type StandardDirection =
         | Left -> 2
         | Right -> 3
 
+    member this.ToChar() =
+        match this with
+        | Up -> '^'
+        | Right -> '>'
+        | Down -> 'v'
+        | Left -> '<'
+
+    static member FromChar(c: char) =
+        match c with
+        | '^' -> Up
+        | '>' -> Right
+        | 'v' -> Down
+        | '<' -> Left
+        | _ -> failwith "Invalid direction character"
+
     static member Indexed = [ (Up, 0); (Down, 1); (Left, 2); (Right, 3) ]
 
     static member Count = 4

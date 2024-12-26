@@ -4,6 +4,8 @@ open System
 open System.IO
 open Advent2024.Common
 
+let filePath = "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day13.txt"
+
 type Button = { Coordinate: Coordinate }
 
 type Prize = { Coordinate: Coordinate }
@@ -13,7 +15,7 @@ type Game =
       ButtonB: Button
       Prize: Prize }
 
-let buildMatrix (A: Button) (B: Button) (prize: Prize) =
+let buildMatrix (A: Button) (B: Button) =
     let size = 100
     let matrix = ResizeArray<ResizeArray<Coordinate>>()
 
@@ -37,6 +39,9 @@ let buildMatrix (A: Button) (B: Button) (prize: Prize) =
         for j in 1..size do
             matrix[i][j] <- matrix[0][j - 1] + matrix[i - 1][0]
 
+    matrix
+
+let findPrize prize (matrix: ResizeArray<ResizeArray<Coordinate>>) =
     // Find matching coordinates
     let matches =
         seq {
@@ -89,8 +94,8 @@ let readGames filePath =
 
 
 let part1 () =
-    let games = readGames "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day13.txt"
+    let games = readGames filePath
 
     games
-    |> List.map (fun game -> buildMatrix game.ButtonA game.ButtonB game.Prize)
+    |> List.map (fun game -> buildMatrix game.ButtonA game.ButtonB |> findPrize game.Prize)
     |> List.sum
