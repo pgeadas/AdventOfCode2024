@@ -222,3 +222,12 @@ let readMatrixAndGroups filePath targetChar =
             | lastGroup, groups -> List.rev (Array.ofSeq (List.rev lastGroup) :: groups)
 
     (matrix, targetPos), groups
+
+let printMatrix matrix =
+    for row in matrix do
+        for c in row do
+            printf "%A " c
+
+        printfn ""
+
+    printfn ""

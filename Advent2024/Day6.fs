@@ -6,13 +6,6 @@ open Advent2024.Matrix
 
 let filePath = "/Users/pgeadas/RiderProjects/Advent2024/Advent2024/inputs/Day6.txt"
 
-let rotate90 direction =
-    match direction with
-    | Up -> Right
-    | Right -> Down
-    | Down -> Left
-    | Left -> Up
-
 let part1 () =
     let matrix, startPosition = readAndFindFirst filePath '^'
 
@@ -25,7 +18,7 @@ let part1 () =
             let nextChar = matrix[fst nextPosition][snd nextPosition]
 
             if nextChar = '#' then
-                countSteps currentPosition (rotate90 direction) steps
+                countSteps currentPosition (direction.Rotate90()) steps
             elif nextChar = 'X' || nextChar = '^' then
                 countSteps nextPosition direction steps
             else
@@ -60,7 +53,7 @@ let part2 () =
                 let nextChar = matrix[fst nextPosition][snd nextPosition]
 
                 if nextChar = '#' then
-                    countSteps currentPosition (rotate90 direction) visited
+                    countSteps currentPosition (direction.Rotate90()) visited
 
                 elif nextChar = 'X' || nextChar = '^' then
                     countSteps nextPosition direction visited

@@ -1,5 +1,23 @@
 module Advent2024.Common
 
+[<Struct>]
+type Coordinate =
+    { X: int
+      Y: int }
+
+    static member Create(x, y) = { X = x; Y = y }
+
+    member this.Add(other: Coordinate) =
+        { X = this.X + other.X
+          Y = this.Y + other.Y }
+
+    static member (+)(a: Coordinate, b: Coordinate) = { X = a.X + b.X; Y = a.Y + b.Y }
+
+    static member (-)(a: Coordinate, b: Coordinate) = { X = a.X - b.X; Y = a.Y - b.Y }
+
+    override this.ToString() = $"X={this.X}, Y={this.Y}"
+
+
 type StandardDirection =
     | Right
     | Left
@@ -34,6 +52,13 @@ type StandardDirection =
         | Down -> 'v'
         | Left -> '<'
 
+    member this.Rotate90() =
+        match this with
+        | Up -> Right
+        | Right -> Down
+        | Down -> Left
+        | Left -> Up
+
     static member FromChar(c: char) =
         match c with
         | '^' -> Up
@@ -54,6 +79,13 @@ let nextPositionStandard (x, y) (direction: StandardDirection) =
     | Left -> (x, y - 1)
     | Up -> (x - 1, y)
     | Down -> (x + 1, y)
+
+let nextCoordinate coordinate (direction: StandardDirection) =
+    match direction with
+    | Right -> Coordinate.Create(coordinate.X, coordinate.Y + 1)
+    | Left -> Coordinate.Create(coordinate.X, coordinate.Y - 1)
+    | Up -> Coordinate.Create(coordinate.X - 1, coordinate.Y)
+    | Down -> Coordinate.Create(coordinate.X + 1, coordinate.Y)
 
 let inferDirection (currentPosX, currentPosY) (previousPosX, previousPosY) =
     match currentPosX - previousPosX, currentPosY - previousPosY with
@@ -83,20 +115,3 @@ let nextPositionExtended (x, y) (direction: ExtendedDirection) =
     | Diagonal UpLeft -> (x - 1, y - 1)
     | Diagonal DownRight -> (x + 1, y + 1)
     | Diagonal DownLeft -> (x + 1, y - 1)
-
-[<Struct>]
-type Coordinate =
-    { X: int
-      Y: int }
-
-    static member Create(x, y) = { X = x; Y = y }
-
-    member this.Add(other: Coordinate) =
-        { X = this.X + other.X
-          Y = this.Y + other.Y }
-
-    static member (+)(a: Coordinate, b: Coordinate) = { X = a.X + b.X; Y = a.Y + b.Y }
-
-    static member (-)(a: Coordinate, b: Coordinate) = { X = a.X - b.X; Y = a.Y - b.Y }
-
-    override this.ToString() = $"X={this.X}, Y={this.Y}"
