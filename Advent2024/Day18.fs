@@ -37,10 +37,9 @@ let findShortestPathCost (matrix: char array list) (startPos: Coordinate) (endPo
         let totalCost = currentCost + moveCost
         let currentBestCost = cost[nextPos.X].[nextPos.Y]
 
-        if totalCost <= currentBestCost then
-            if totalCost < currentBestCost then
-                cost[nextPos.X].[nextPos.Y] <- totalCost
-                queue.Enqueue((nextPos, totalCost), totalCost)
+        if totalCost < currentBestCost then
+            cost[nextPos.X].[nextPos.Y] <- totalCost
+            queue.Enqueue((nextPos, totalCost), totalCost)
 
     let rec processQueue () =
         if queue.Count = 0 then
