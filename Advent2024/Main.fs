@@ -79,8 +79,12 @@ let runDay11 () =
     executeTimed Day11.part2
 
 let runDay13 () =
+    printfn "Part 1 (brute force): "
+    executeTimed Day13.part1_1
     printfn "Part 1: "
     executeTimed Day13.part1
+    printfn "Part 2: "
+    executeTimed Day13.part2
 
 let runDay14 () =
     printfn "Part 1: "
