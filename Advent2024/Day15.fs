@@ -130,70 +130,59 @@ let largeWarehouse (matrix: char array list) =
 
 type Search = { mutable value: bool }
 
-let tryFindNextEmptyPosition2
+let tryFindNextEmptyPositionUpOrDown
     (matrix: ResizeArray<ResizeArray<char>>)
     (direction: StandardDirection)
     (currentPosition: int * int)
     =
 
-    let rec searchInDirection left right (checkedPositions: HashSet<Option<(int * int)>>) (keepSearching: Search) =
-        let nextLeftX, nextLeftY = nextPositionStandard left direction
-        let nextRightX, nextRightY = nextPositionStandard right direction
+    let rec searchInDirection left right (checkedPositions: HashSet<Option<int * int>>) (keepSearching: Search) =
+        let nextPosLeft = nextPositionStandard left direction
+        let nextLeftX, nextLeftY = nextPosLeft
+        let nextPosRight = nextPositionStandard right direction
+        let nextRightX, nextRightY = nextPosRight
+
+        let addToCheckedPositions pos1 pos2 (checkedPositions: HashSet<Option<int * int>>) =
+            checkedPositions.Add(Some(pos1)) |> ignore
+            checkedPositions.Add(Some(pos2)) |> ignore
 
         match matrix[nextLeftX][nextLeftY], matrix[nextRightX][nextRightY] with
-        | '#', _ ->
-            keepSearching.value <- false
-            checkedPositions.Add(None) |> ignore
-            checkedPositions
+        | '#', _
         | _, '#' ->
             keepSearching.value <- false
             checkedPositions.Add(None) |> ignore
             checkedPositions
         | '.', '.' ->
-            checkedPositions.Add(Some(nextLeftX, nextLeftY)) |> ignore
-            checkedPositions.Add(Some(nextRightX, nextRightY)) |> ignore
+            addToCheckedPositions nextPosLeft nextPosRight checkedPositions
             checkedPositions
         | '.', '[' ->
-            checkedPositions.Add(Some(nextLeftX, nextLeftY)) |> ignore
-            checkedPositions.Add(Some(nextRightX, nextRightY)) |> ignore
-            searchInDirection (nextRightX, nextRightY) (nextRightX, nextRightY + 1) checkedPositions keepSearching
+            addToCheckedPositions nextPosLeft nextPosRight checkedPositions
+            searchInDirection nextPosRight (nextRightX, nextRightY + 1) checkedPositions keepSearching
         | ']', '.' ->
-            checkedPositions.Add(Some(nextLeftX, nextLeftY)) |> ignore
-            checkedPositions.Add(Some(nextRightX, nextRightY)) |> ignore
-            searchInDirection (nextLeftX, nextLeftY - 1) (nextLeftX, nextLeftY) checkedPositions keepSearching
+            addToCheckedPositions nextPosLeft nextPosRight checkedPositions
+            searchInDirection (nextLeftX, nextLeftY - 1) nextPosLeft checkedPositions keepSearching
         | ']', '[' ->
-            checkedPositions.Add(Some(nextLeftX, nextLeftY)) |> ignore
-            checkedPositions.Add(Some(nextRightX, nextRightY)) |> ignore
-
-            searchInDirection (nextLeftX, nextLeftY - 1) (nextLeftX, nextLeftY) checkedPositions keepSearching
-            |> ignore
-
-            searchInDirection (nextRightX, nextRightY) (nextRightX, nextRightY + 1) checkedPositions keepSearching
+            addToCheckedPositions nextPosLeft nextPosRight checkedPositions
+            searchInDirection (nextLeftX, nextLeftY - 1) nextPosLeft checkedPositions keepSearching |> ignore
+            searchInDirection nextPosRight (nextRightX, nextRightY + 1) checkedPositions keepSearching
         | _ ->
-            checkedPositions.Add(Some(nextLeftX, nextLeftY)) |> ignore
-            checkedPositions.Add(Some(nextRightX, nextRightY)) |> ignore
-            searchInDirection (nextLeftX, nextLeftY) (nextRightX, nextRightY) checkedPositions keepSearching
+            addToCheckedPositions nextPosLeft nextPosRight checkedPositions
+            searchInDirection nextPosLeft nextPosRight checkedPositions keepSearching
 
     let mutable keepSearching = { value = true }
     let x, y = currentPosition
-    let checkedPositions = HashSet<Option<(int * int)>>()
+    let checkedPositions = HashSet<Option<int * int>>()
 
-    if direction = StandardDirection.Up && matrix[x - 1][y] = ']' then
-        searchInDirection (x - 1, y - 1) (x - 1, y) checkedPositions keepSearching
-        |> Seq.rev
-        |> Seq.toList
-    elif direction = StandardDirection.Up && matrix[x - 1][y] = '[' then
-        searchInDirection (x - 1, y) (x - 1, y + 1) checkedPositions keepSearching
-        |> Seq.rev
-        |> Seq.toList
-    elif direction = StandardDirection.Down && matrix[x + 1][y] = ']' then
-        searchInDirection (x + 1, y - 1) (x + 1, y) checkedPositions keepSearching
-        |> Seq.rev
-        |> Seq.toList
-    else
-        searchInDirection (x + 1, y) (x + 1, y + 1) checkedPositions keepSearching
-        |> Seq.rev
-        |> Seq.toList
+    let initialSearch =
+        match direction with
+        | StandardDirection.Up when matrix[x - 1][y] = ']' ->
+            searchInDirection (x - 1, y - 1) (x - 1, y) checkedPositions keepSearching
+        | StandardDirection.Up -> searchInDirection (x - 1, y) (x - 1, y + 1) checkedPositions keepSearching
+        | StandardDirection.Down when matrix[x + 1][y] = ']' ->
+            searchInDirection (x + 1, y - 1) (x + 1, y) checkedPositions keepSearching
+        | _ -> searchInDirection (x + 1, y) (x + 1, y + 1) checkedPositions keepSearching
+
+    initialSearch |> Seq.rev |> Seq.toList
 
 let rec moveLarge
     (currentPosition: int * int)
@@ -201,18 +190,50 @@ let rec moveLarge
     (moves: ResizeArray<StandardDirection * int>)
     =
 
+    // remove the head move if no more steps are left
+    let removeHeadIfZero (moves: ResizeArray<StandardDirection * int>) =
+        if (snd moves[0] = 0) then
+            moves.RemoveAt(0)
+
+    let processVerticalMovement
+        (matrix: ResizeArray<ResizeArray<char>>)
+        (currentPosition: int * int)
+        (nextPosition: int * int)
+        (direction: StandardDirection)
+        (moves: ResizeArray<StandardDirection * int>)
+        (sortDirection: (int * int) seq -> (int * int) seq)
+        =
+        let nextEmptyPositions =
+            tryFindNextEmptyPositionUpOrDown matrix direction currentPosition
+
+        match nextEmptyPositions |> Seq.tryFind ((=) None) with
+        | Some _ ->
+            moves.RemoveAt(0)
+            moveLarge currentPosition matrix moves
+        | None ->
+            let delta = if direction = StandardDirection.Up then 1 else -1
+
+            nextEmptyPositions
+            |> Seq.choose id
+            |> sortDirection
+            |> Seq.iter (fun pos ->
+                let x, y = pos
+                let prevX = x + delta
+                let prevChar = matrix[prevX][y]
+                matrix[x][y] <- prevChar
+                matrix[prevX][y] <- '.')
+
+            // Update the remaining moves and positions
+            moves[0] <- (direction, snd moves[0] - 1)
+            matrix[fst currentPosition][snd currentPosition] <- '.'
+            matrix[fst nextPosition][snd nextPosition] <- '@'
+
+            removeHeadIfZero moves
+            moveLarge nextPosition matrix moves
+
     if (moves.Count = 0) then
-        //printMatrix matrix
         matrix
     else
-        // printMatrix matrix
-        // printfn "Current position: %A" (moves.Item(0))
-
-        // remove the head move if no more steps are left
-        let removeHeadIfZero (moves: ResizeArray<StandardDirection * int>) =
-            if (snd moves[0] = 0) then
-                moves.RemoveAt(0)
-
         let currentDirection, currentSteps = Seq.head moves
         let nextX, nextY = nextPositionStandard currentPosition currentDirection
         let currentX, currentY = currentPosition
@@ -220,70 +241,22 @@ let rec moveLarge
         if matrix[nextX][nextY] = '#' then // cant move more in this direction
             moves.RemoveAt(0)
             moveLarge currentPosition matrix moves
+
         else if matrix[nextX][nextY] = '.' then // can move in this direction
             moves[0] <- (currentDirection, currentSteps - 1)
             matrix[nextX][nextY] <- '@'
             matrix[currentX][currentY] <- '.'
             removeHeadIfZero moves
             moveLarge (nextX, nextY) matrix moves
+
         else if currentDirection = StandardDirection.Up then
-
-            let nextEmptyPositions =
-                tryFindNextEmptyPosition2 matrix currentDirection currentPosition
-
-            let none = nextEmptyPositions |> Seq.tryFind (fun pos -> pos = None)
-
-            match none with
-            | Some _ ->
-                moves.RemoveAt(0)
-                moveLarge currentPosition matrix moves
-            | None ->
-                nextEmptyPositions
-                |> Seq.choose id
-                |> Seq.sortBy fst
-                |> Seq.iter (fun pos ->
-                    let x, y = pos
-                    let prevChar = matrix[x + 1][y]
-                    matrix[x][y] <- prevChar
-                    matrix[x + 1][y] <- '.')
-
-                moves[0] <- (currentDirection, currentSteps - 1)
-                matrix[fst currentPosition][snd currentPosition] <- '.'
-                matrix[nextX][nextY] <- '@'
-
-                removeHeadIfZero moves
-                moveLarge (nextX, nextY) matrix moves
-
+            processVerticalMovement matrix currentPosition (nextX, nextY) currentDirection moves (Seq.sortBy fst)
         else if currentDirection = StandardDirection.Down then
+            processVerticalMovement matrix currentPosition (nextX, nextY) currentDirection moves (Seq.sortByDescending fst)
 
-            let nextEmptyPositions =
-                tryFindNextEmptyPosition2 matrix currentDirection currentPosition
-
-            let none = nextEmptyPositions |> Seq.tryFind (fun pos -> pos = None)
-
-            match none with
-            | Some _ ->
-                moves.RemoveAt(0)
-                moveLarge currentPosition matrix moves
-            | None ->
-                nextEmptyPositions
-                |> Seq.choose id
-                |> Seq.sortByDescending fst
-                |> Seq.iter (fun pos ->
-                    let x, y = pos
-                    let prevChar = matrix[x - 1][y]
-                    matrix[x][y] <- prevChar
-                    matrix[x - 1][y] <- '.')
-
-                moves[0] <- (currentDirection, currentSteps - 1)
-                matrix[fst currentPosition][snd currentPosition] <- '.'
-                matrix[nextX][nextY] <- '@'
-
-                removeHeadIfZero moves
-                moveLarge (nextX, nextY) matrix moves
-
-        else
-            let move x y delta =
+        else // move left or right
+            let move x y direction =
+                let delta = if direction = StandardDirection.Left then 1 else -1
                 let mutable finalY = y
 
                 while finalY <> snd currentPosition do
@@ -299,12 +272,7 @@ let rec moveLarge
                 tryFindNextEmptyPosition matrix currentDirection currentPosition
 
             match nextEmptyPosition with
-            | Some(x, y) ->
-                if currentDirection = StandardDirection.Left then
-                    move x y 1
-                else
-                    move x y -1
-
+            | Some(x, y) -> move x y currentDirection
             | None ->
                 moves.RemoveAt(0)
                 moveLarge currentPosition matrix moves
