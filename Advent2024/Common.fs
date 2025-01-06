@@ -7,9 +7,12 @@ type Coordinate =
 
     static member Create(x, y) = { X = x; Y = y }
 
-    member this.Add(other: Coordinate) =
-        { X = this.X + other.X
-          Y = this.Y + other.Y }
+    member this.Add(other: Coordinate) = { X = this.X + other.X; Y = this.Y + other.Y }
+
+    member this.Right() = { X = this.X; Y = this.Y + 1 }
+    member this.Left() = { X = this.X; Y = this.Y - 1 }
+    member this.Up() = { X = this.X - 1; Y = this.Y }
+    member this.Down() = { X = this.X + 1; Y = this.Y }
 
     static member (+)(a: Coordinate, b: Coordinate) = { X = a.X + b.X; Y = a.Y + b.Y }
 
