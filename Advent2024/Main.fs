@@ -116,6 +116,12 @@ let runDay19 () =
     printfn "Part 2: "
     executeTimed Day19.part2
 
+let runDay20 () =
+    printfn "Part 1: "
+    executeTimed Day20.part1
+    printfn "Part 2: "
+    executeTimed Day20.part2
+
 let runDay21 () =
     printf "Part 1: "
     executeTimed Day21.part1
@@ -155,6 +161,7 @@ let main argv =
         | 16 -> runDay16 ()
         | 18 -> runDay18 ()
         | 19 -> runDay19 ()
+        | 20 -> runDay20 ()
         | 21 -> runDay21 ()
         | 23 -> runDay23 ()
         | 25 -> runDay25 ()
