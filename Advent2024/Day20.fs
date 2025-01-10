@@ -32,7 +32,7 @@ let findCheatCosts (matrix: char array list) startPos endPos =
                         yield res
     }
 
-let calculateCheatCosts normalCost minSavedCost costs =
+let calculateCheatSavedCosts normalCost minSavedCost costs =
     costs
     |> Seq.filter (fun cost -> cost < normalCost) // only consider costs that are lower than the normal cost
     |> Seq.map (fun cost -> normalCost - cost) // get the saved picoseconds
@@ -43,7 +43,7 @@ let calculateCheatCosts normalCost minSavedCost costs =
 
 let countBestCheats (matrix: char array list) startPos endPos =
     let normalCost = findShortestPathCost matrix startPos endPos
-    findCheatCosts matrix startPos endPos |> calculateCheatCosts normalCost 100
+    findCheatCosts matrix startPos endPos |> calculateCheatSavedCosts normalCost 100
 
 let part1 () =
     let matrix, positions = readAndFindAllChars filePath [ 'S'; 'E' ]
@@ -115,9 +115,9 @@ let countBestCheats2 (matrix: char array list) startPos endPos =
         let res = findShortestPathCost matrix startPos endPos
         path |> Seq.iter (fun (x, y) -> matrix[x][y] <- '#') // backtrack
         res)
-    |> calculateCheatCosts normalCost 100
+    |> calculateCheatSavedCosts normalCost 100
 
-let part2 () =
+let part2() =
     let matrix, positions = readAndFindAllChars filePath [ 'S'; 'E' ]
 
     let findPosition char = positions |> List.find (fun (x, _) -> x = char) |> snd
@@ -128,4 +128,3 @@ let part2 () =
     matrix[endPos.X][endPos.Y] <- '.'
 
     countBestCheats2 matrix startPos endPos
-

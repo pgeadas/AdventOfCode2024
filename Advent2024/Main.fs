@@ -118,9 +118,9 @@ let runDay19 () =
 
 let runDay20 () =
     printfn "Part 1: "
-    executeTimed Day20.part1
+    executeTimed Day20v2.part1
     printfn "Part 2: "
-    executeTimed Day20.part2
+    //executeTimed Day20v2.part1
 
 let runDay21 () =
     printf "Part 1: "

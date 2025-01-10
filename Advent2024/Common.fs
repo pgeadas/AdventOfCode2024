@@ -1,6 +1,7 @@
 module Advent2024.Common
 
-[<Struct>]
+
+[<Struct>] // already implements Equals and HashCode
 type Coordinate =
     { X: int
       Y: int }
