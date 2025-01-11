@@ -117,10 +117,12 @@ let runDay19 () =
     executeTimed Day19.part2
 
 let runDay20 () =
-    printfn "Part 1: "
+    printfn "Part 1 with sequence: "
+    executeTimed Day20v2.part1WithSequence
+    printfn "Part 1 with counter: "
     executeTimed Day20v2.part1
     printfn "Part 2: "
-    //executeTimed Day20v2.part1
+    executeTimed Day20v2.part2
 
 let runDay21 () =
     printf "Part 1: "
